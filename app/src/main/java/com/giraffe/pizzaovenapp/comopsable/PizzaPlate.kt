@@ -51,11 +51,14 @@ fun PizzaPlate(
                     painter = painterResource(breads[it]),
                     contentDescription = "bread"
                 )
-                Image(
-                    modifier = Modifier.size(50.dp),
-                    painter = painterResource(R.drawable.basil_1),
-                    contentDescription = "ingredient"
-                )
+                ingredients.forEach { ingredient ->
+                    Image(
+                        modifier = Modifier.size(50.dp),
+                        painter = painterResource(ingredient.images.random()),
+                        contentDescription = "ingredient"
+                    )
+                }
+
             }
         }
     }

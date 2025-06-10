@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +49,7 @@ import com.giraffe.pizzaovenapp.ui.theme.green
 @Composable
 fun PizzaScreen() {
     var pizzaSize by remember { mutableStateOf(PizzaSize.MEDUIM) }
+    val ingredients = remember { mutableStateListOf<PizzaIngredient>() }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +70,8 @@ fun PizzaScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
-                pizzaSize = pizzaSize
+                pizzaSize = pizzaSize,
+                ingredients = ingredients.toSet()
             )
             Text(
                 modifier = Modifier.padding(16.dp),
@@ -83,7 +86,7 @@ fun PizzaScreen() {
                         modifier = Modifier
                             .size(50.dp)
                             .background(
-                                color = if (pizzaSize == size) green.copy(.2f) else Color.Transparent,
+                                color = if (pizzaSize == size) green.copy(.1f) else Color.Transparent,
                                 shape = CircleShape
                             )
                             .clickable(
@@ -112,12 +115,27 @@ fun PizzaScreen() {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(PizzaIngredient.entries) { index, item ->
+                itemsIndexed(PizzaIngredient.entries) { index, ingredient ->
                     Image(
                         modifier = Modifier
                             .size(80.dp)
-                            .clickable {},
-                        painter = painterResource(item.images.first()),
+
+                            .background(
+                                color = if (ingredient in ingredients) green.copy(.1f) else Color.Transparent,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(8.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = null
+                            ) {
+                                if (ingredient !in ingredients) {
+                                    ingredients.add(ingredient)
+                                } else {
+                                    ingredients.remove(ingredient)
+                                }
+                            },
+                        painter = painterResource(ingredient.images.first()),
                         contentDescription = "ingredient"
                     )
                 }
