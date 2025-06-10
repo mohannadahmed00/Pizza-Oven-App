@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.giraffe.pizzaovenapp.comopsable.AppBar
 import com.giraffe.pizzaovenapp.comopsable.PizzaPlate
-import com.giraffe.pizzaovenapp.model.PizzaIngredient
+import com.giraffe.pizzaovenapp.model.PizzaTopping
 import com.giraffe.pizzaovenapp.model.PizzaSize
 import com.giraffe.pizzaovenapp.ui.theme.PizzaOvenAppTheme
 import com.giraffe.pizzaovenapp.ui.theme.brown
@@ -48,8 +48,8 @@ import com.giraffe.pizzaovenapp.ui.theme.green
 
 @Composable
 fun PizzaScreen() {
-    var pizzaSize by remember { mutableStateOf(PizzaSize.MEDUIM) }
-    val ingredients = remember { mutableStateListOf<PizzaIngredient>() }
+    var selectedPizzaSize by remember { mutableStateOf(PizzaSize.MEDUIM) }
+    val selectedToppings = remember { mutableStateListOf<PizzaTopping>() }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -70,8 +70,8 @@ fun PizzaScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
-                pizzaSize = pizzaSize,
-                ingredients = ingredients.toSet()
+                pizzaSize = selectedPizzaSize,
+                toppings = selectedToppings.toSet()
             )
             Text(
                 modifier = Modifier.padding(16.dp),
@@ -86,14 +86,14 @@ fun PizzaScreen() {
                         modifier = Modifier
                             .size(50.dp)
                             .background(
-                                color = if (pizzaSize == size) green.copy(.1f) else Color.Transparent,
+                                color = if (selectedPizzaSize == size) green.copy(.1f) else Color.Transparent,
                                 shape = CircleShape
                             )
                             .clickable(
                                 indication = null,
                                 interactionSource = null
                             ) {
-                                pizzaSize = size
+                                selectedPizzaSize = size
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -115,13 +115,13 @@ fun PizzaScreen() {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(PizzaIngredient.entries) { index, ingredient ->
+                itemsIndexed(PizzaTopping.entries) { index, topping ->
                     Image(
                         modifier = Modifier
                             .size(80.dp)
 
                             .background(
-                                color = if (ingredient in ingredients) green.copy(.1f) else Color.Transparent,
+                                color = if (topping in selectedToppings) green.copy(.1f) else Color.Transparent,
                                 shape = RoundedCornerShape(16.dp)
                             )
                             .padding(8.dp)
@@ -129,14 +129,14 @@ fun PizzaScreen() {
                                 indication = null,
                                 interactionSource = null
                             ) {
-                                if (ingredient !in ingredients) {
-                                    ingredients.add(ingredient)
+                                if (topping !in selectedToppings) {
+                                    selectedToppings.add(topping)
                                 } else {
-                                    ingredients.remove(ingredient)
+                                    selectedToppings.remove(topping)
                                 }
                             },
-                        painter = painterResource(ingredient.images.first()),
-                        contentDescription = "ingredient"
+                        painter = painterResource(topping.images.first()),
+                        contentDescription = "topping"
                     )
                 }
             }
@@ -150,7 +150,7 @@ fun PizzaScreen() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart")
+                    Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "cart")
                     Text(text = "Add to cart", style = MaterialTheme.typography.labelLarge)
                 }
             }

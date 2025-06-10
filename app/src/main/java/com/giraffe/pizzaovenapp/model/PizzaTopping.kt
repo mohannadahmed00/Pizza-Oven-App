@@ -3,7 +3,7 @@ package com.giraffe.pizzaovenapp.model
 import com.giraffe.pizzaovenapp.R
 
 
-enum class PizzaIngredient(val images: List<Int>) {
+enum class PizzaTopping(val images: List<Int>) {
     BASIL(
         listOf(
             R.drawable.basil_1,
