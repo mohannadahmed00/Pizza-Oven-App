@@ -18,7 +18,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PizzaOvenAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { PizzaScreen() }
+                Scaffold(modifier = Modifier.fillMaxSize()) {
+                    PizzaScreen()
+                }
             }
         }
     }
