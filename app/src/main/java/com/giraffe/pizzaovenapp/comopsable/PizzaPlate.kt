@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.giraffe.pizzaovenapp.R
 import com.giraffe.pizzaovenapp.model.PizzaSize
 import com.giraffe.pizzaovenapp.model.PizzaTopping
@@ -60,7 +62,9 @@ fun PizzaPlate(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Image(painter = painterResource(R.drawable.plate), contentDescription = "plate")
+        Image(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            painter = painterResource(R.drawable.plate), contentDescription = "plate")
         HorizontalPager(
             state = pagerState,
             beyondViewportPageCount = 5
