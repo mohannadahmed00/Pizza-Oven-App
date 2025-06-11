@@ -1,26 +1,24 @@
 package com.giraffe.pizzaovenapp.comopsable
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.giraffe.pizzaovenapp.R
 import com.giraffe.pizzaovenapp.model.PizzaSize
 import com.giraffe.pizzaovenapp.model.PizzaTopping
+import com.giraffe.pizzaovenapp.model.PizzaUiState
 import com.giraffe.pizzaovenapp.ui.theme.PizzaOvenAppTheme
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -28,31 +26,34 @@ import com.giraffe.pizzaovenapp.ui.theme.PizzaOvenAppTheme
 fun PizzaPlate(
     modifier: Modifier = Modifier,
     pizzaSize: PizzaSize = PizzaSize.MEDUIM,
-    toppings: Set<PizzaTopping> = setOf<PizzaTopping>()
+    clickedTopping: PizzaTopping? = null,
+    resetTopping: () -> Unit = {}
 ) {
-    val breads by remember {
-        mutableStateOf(
-            listOf(
-                R.drawable.bread_1,
-                R.drawable.bread_2,
-                R.drawable.bread_3,
-                R.drawable.bread_4,
-                R.drawable.bread_5,
-            )
+    val pizzaUiStates = remember {
+        mutableStateListOf(
+            PizzaUiState(bread = R.drawable.bread_1),
+            PizzaUiState(bread = R.drawable.bread_2),
+            PizzaUiState(bread = R.drawable.bread_3),
+            PizzaUiState(bread = R.drawable.bread_4),
+            PizzaUiState(bread = R.drawable.bread_5),
         )
     }
     val pagerState = rememberPagerState { 5 }
-    val toppingAnimatedSize by animateDpAsState(targetValue = if (PizzaTopping.BASIL in toppings) 50.dp else 300.dp)
     val pizzaAnimatedSize = remember { Animatable(pizzaSize.value) }
-    val toppingAnimatedOpacity = remember { Animatable(0f) }
     LaunchedEffect(pizzaSize) {
         pizzaAnimatedSize.animateTo(pizzaSize.value)
     }
-    LaunchedEffect(PizzaTopping.BASIL in toppings) {
-        if (PizzaTopping.BASIL in toppings) {
-            toppingAnimatedOpacity.animateTo(1f)
-        } else {
-            toppingAnimatedOpacity.snapTo(0f)
+    LaunchedEffect(clickedTopping) {
+        Log.d("messi", "PizzaPlate: clickedTopping = $clickedTopping")
+        if (clickedTopping != null) {
+            val currentPizza = pizzaUiStates[pagerState.currentPage]
+            val newToppings = if (clickedTopping in currentPizza.toppings) {
+                currentPizza.toppings - clickedTopping
+            } else {
+                currentPizza.toppings + clickedTopping
+            }
+            pizzaUiStates[pagerState.currentPage] = currentPizza.copy(toppings = newToppings)
+            resetTopping()
         }
     }
     Box(
@@ -61,60 +62,11 @@ fun PizzaPlate(
     ) {
         Image(painter = painterResource(R.drawable.plate), contentDescription = "plate")
         HorizontalPager(
-            modifier = Modifier,
-            state = pagerState
+            state = pagerState,
+            beyondViewportPageCount = 5
+
         ) { page ->
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    modifier = Modifier.fillMaxSize(pizzaAnimatedSize.value),
-                    painter = painterResource(breads[page]),
-                    contentDescription = "bread"
-                )
-                Topping(
-                    pizzaSize = pizzaAnimatedSize.value,
-                    topping = PizzaTopping.BASIL,
-                    toppingAnimatedSize = toppingAnimatedSize,
-                    toppingAnimatedOpacity = toppingAnimatedOpacity.value
-                )
-                /*if (PizzaTopping.BASIL in pizzas[page].topping) {
-                    Spread(
-                        pizzaSize = animatedPizzaSize.value,
-                        topping = PizzaTopping.BASIL,
-                        toppingAnimatedSize = basilAnimatedSize,
-                    )
-                }
-                if (PizzaTopping.BROCCOLI in pizzas[page].topping) {
-                    Spread(
-                        pizzaSize = animatedPizzaSize.value,
-                        topping = PizzaTopping.BROCCOLI,
-                        toppingAnimatedSize = broccoliAnimatedSize,
-                    )
-                }
-                if (PizzaTopping.MUSHROOM in pizzas[page].topping) {
-                    Spread(
-                        pizzaSize = animatedPizzaSize.value,
-                        topping = PizzaTopping.MUSHROOM,
-                        toppingAnimatedSize = mushroomAnimatedSize,
-                    )
-                }
-                if (PizzaTopping.ONION in pizzas[page].topping) {
-                    Spread(
-                        pizzaSize = animatedPizzaSize.value,
-                        topping = PizzaTopping.ONION,
-                        toppingAnimatedSize = onionAnimatedSize,
-                    )
-                }
-                if (PizzaTopping.SAUSAGE in pizzas[page].topping) {
-                    Spread(
-                        pizzaSize = animatedPizzaSize.value,
-                        topping = PizzaTopping.SAUSAGE,
-                        toppingAnimatedSize = sausageAnimatedSize,
-                    )
-                }*/
-            }
+            Pizza(state = pizzaUiStates[page], pizzaSize = pizzaSize.value)
         }
     }
 }

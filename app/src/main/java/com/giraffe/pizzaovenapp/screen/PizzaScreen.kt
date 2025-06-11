@@ -28,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,8 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.giraffe.pizzaovenapp.comopsable.AppBar
 import com.giraffe.pizzaovenapp.comopsable.PizzaPlate
-import com.giraffe.pizzaovenapp.model.PizzaTopping
 import com.giraffe.pizzaovenapp.model.PizzaSize
+import com.giraffe.pizzaovenapp.model.PizzaTopping
 import com.giraffe.pizzaovenapp.ui.theme.PizzaOvenAppTheme
 import com.giraffe.pizzaovenapp.ui.theme.brown
 import com.giraffe.pizzaovenapp.ui.theme.green
@@ -49,7 +48,7 @@ import com.giraffe.pizzaovenapp.ui.theme.green
 @Composable
 fun PizzaScreen() {
     var selectedPizzaSize by remember { mutableStateOf(PizzaSize.MEDUIM) }
-    val selectedToppings = remember { mutableStateListOf<PizzaTopping>() }
+    var clickedTopping by remember { mutableStateOf<PizzaTopping?>(null) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +70,8 @@ fun PizzaScreen() {
                     .fillMaxWidth()
                     .aspectRatio(1f),
                 pizzaSize = selectedPizzaSize,
-                toppings = selectedToppings.toSet()
+                clickedTopping = clickedTopping,
+                resetTopping = { clickedTopping = null }
             )
             Text(
                 modifier = Modifier.padding(16.dp),
@@ -119,21 +119,12 @@ fun PizzaScreen() {
                     Image(
                         modifier = Modifier
                             .size(80.dp)
-
-                            .background(
-                                color = if (topping in selectedToppings) green.copy(.1f) else Color.Transparent,
-                                shape = RoundedCornerShape(16.dp)
-                            )
                             .padding(8.dp)
                             .clickable(
                                 indication = null,
                                 interactionSource = null
                             ) {
-                                if (topping !in selectedToppings) {
-                                    selectedToppings.add(topping)
-                                } else {
-                                    selectedToppings.remove(topping)
-                                }
+                                clickedTopping = topping
                             },
                         painter = painterResource(topping.images.first()),
                         contentDescription = "topping"
